@@ -2,8 +2,11 @@
  
 ### Possible Dictionary implementation
 ```python
+# Contributor = ('Name of Person', 'name of meal')
+mike_start_rice = ('Michael', 'Rice')
+kofi_des_icecream = ('Kofi', 'Ice Cream')
 
-contributors = [('Name of Person', 'meal_cat', 'name of meal')]
+# Append Contribution to the Approrpiate arrays!
 meal_cat = {
     'starter' : [],
     'main meal' : [],
