@@ -8,11 +8,11 @@ kofi_des_icecream = ('Kofi', 'Ice Cream')
 
 # Append Contribution to the Approrpiate arrays!
 meal_cat = {
-    'starter' : [],
-    'main meal' : [],
-    'drinks' :[],
-    'dessert' : [],
-    'nothing' : []
+  'starter' : [],
+  'main meal' : [],
+  'drinks' :[],
+  'dessert' : [],
+  'nothing' : []
 }
 ```
 
