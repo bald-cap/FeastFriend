@@ -1,4 +1,5 @@
 from tkinter import *
+import copy
 
 root = Tk()
 root.title('FeastFriend')
@@ -22,7 +23,7 @@ event_obj = {
 }
 
 for event in event_obj:
-    event_obj[event] = meal_cat 
+    event_obj[event] = copy.deepcopy(meal_cat) 
 
 welcome_mes = Label(root, text="FeastFriends", font=('monospace', 10, 'bold'), fg= "#5D54B1", bg="#FCFBFD")
 welcome_mes.grid(row=0, column=0)
@@ -91,6 +92,8 @@ def event_select(event):
 
             root.geometry('800x500')
             return_btn.grid(row=0, column=0)
+            meal_cat_wrapper.grid(row=1, column=0)
+            partic_wrap.grid(row=1, column=1)
         else:
             events_frame.itemconfig(event_pos, selectbackground= '#5D52BE', selectforeground= '#FFF6FF')
 
@@ -133,13 +136,19 @@ new_event_name.set('Enter Event Name: ')
 
 def add_event_act():
     event_e = new_event_name.get()
-    event_obj[event_e] = meal_cat
+    event_obj[event_e] = copy.deepcopy(meal_cat)
+
+    events_frame.insert(END, event_e)
+    events_frame.insert(END, '')
+
+    add_event_input.config(fg="#628281", font=('Segoe UI sans serif', 10, 'italic'))
+    new_event_name.set(event_e + ' Added')
 
 def add_change_text(event):
     new_event_name.set('')
     add_event_input.config(fg='black', font=('Segoe UI sans serif', 13))
 
-add_event_input = Entry(mod_event_frame, width=25, font=('Segoe UI sans serif', 13, 'italic'), textvariable=new_event_name, fg='grey')
+add_event_input = Entry(mod_event_frame, width=25, font=('Segoe UI sans serif', 10, 'italic'), textvariable=new_event_name, fg='grey')
 add_event_input.bind('<Button-1>', add_change_text)
 
 def add_sub_enter(event):
@@ -155,6 +164,9 @@ add_submit.bind('<Leave>', add_sub_lve)
 def add_event():
     events_wrap.grid_remove()
     btn_frame.grid_remove()
+
+    add_event_input.config(fg='grey', font=('Segoe UI sans serif', 10))
+    new_event_name.set('Enter Event Name: ')
 
     root.geometry("500x300")
 
@@ -184,13 +196,20 @@ old_event_name.set('Enter Event Name: ')
 
 def del_event_act():
     event_e = old_event_name.get()
-    del event_obj[event_e]
+
+    for i in range(events_frame.size()):
+        if old_event_name.get() == events_frame.get(i):
+            events_frame.delete(i)
+            del event_obj[event_e]
+
+            del_event_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
+            old_event_name.set(event_e + ' Deleted')
 
 def del_change_text(event):
     old_event_name.set('')
     del_event_input.config(fg='black', font=('Segoe UI sans serif', 13))
 
-del_event_input = Entry(mod_event_frame, width=25, font=('Segoe UI sans serif', 13, 'italic'), textvariable=old_event_name, fg='grey')
+del_event_input = Entry(mod_event_frame, width=25, font=('Segoe UI sans serif', 10, 'italic'), textvariable=old_event_name, fg='grey')
 del_event_input.bind('<Button-1>', del_change_text)
 
 def del_sub_enter(event):
@@ -213,6 +232,9 @@ def del_event():
     events_wrap.grid_remove()
     btn_frame.grid_remove()
 
+    del_event_input.config(fg='grey', font=('Segoe UI sans serif', 10))
+    old_event_name.set('Enter Event Name: ')
+
     root.geometry("500x300")
 
     mod_event_frame.config(bg='#ADA9BB')
@@ -228,6 +250,66 @@ del_event_btn = Button(btn_frame, text="DELETE EVENT", font=('monospace', 13, 'b
 del_event_btn.grid(row=0, column=1, padx=(0,5))
 del_event_btn.bind('<Enter>', del_enter_event)
 del_event_btn.bind('<Leave>', del_lve_event)
+
+
+# MEAL CATEGORY PRESENTATION
+meal_cat_wrapper = Frame(root)
+
+# STARTER
+starter_wrap = Frame(meal_cat_wrapper)
+starter_wrap.grid(row=0, column=0, padx=10)
+
+starter_lab = Label(starter_wrap)
+starter_lab.grid(row=0, column=0, pady=10)
+
+starter_cat = Listbox(starter_wrap)
+starter_lab.grid(row=1, column=0)
+
+
+# DRINKS
+drinks_wrap = Frame(meal_cat_wrapper)
+starter_wrap.grid(row=0, column=1, padx=(0, 10))
+
+drinks_lab = Label(drinks_wrap)
+drinks_lab.grid(row=0, column=0, pady=10)
+
+drinks_cat = Listbox(drinks_wrap)
+drinks_cat.grid(row=1, column=0)
+
+
+# MAIN MEAL
+main_meal_wrap = Frame(meal_cat_wrapper)
+starter_wrap.grid(row=1, column=0, padx=10, pady=10)
+
+main_meal_lab = Label(main_meal_wrap)
+main_meal_lab.grid(row=0, column=0, pady=10)
+
+main_meal_cat = Listbox(main_meal_wrap)
+main_meal_cat.grid(row=1, column=0)
+
+
+# DESSERT
+dessert_wrap = Frame(meal_cat_wrapper)
+dessert_wrap.grid(row=1, column=1, padx=(0, 10))
+
+desseert_lab = Label(dessert_wrap)
+desseert_lab.grid(row=0, column=0, pady=10)
+
+dessert_cat = Listbox(dessert_wrap)
+dessert_cat.grid(row=1, column=0)
+
+
+# PARTICIPANTS LIST
+partic_wrap = Frame(root)
+
+partic_lab = Label(partic_wrap)
+partic_lab.grid(row=0, column=0, pady=10)
+
+partic_list = Listbox(partic_wrap)
+partic_list.grid(row=1, column=0)
+
+
+
 
 cols, rows = root.grid_size()
 for i in range(cols):
