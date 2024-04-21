@@ -9,17 +9,14 @@ root.config(bg='#FCFBFD')
 #OBJECTS/ EVENT CONTROL
 meal_cat = {
     'starter' : [('Michael', 'Pickles'), ('Kofi', 'Chips')],
-    'main meal' : [('Divin', 'Banku'), ('Emma', 'Tuo Zaafi')],
+    'main_meal' : [('Divin', 'Banku'), ('Emma', 'Tuo Zaafi')],
     'drinks' :[('Andi', 'Wine'), ('Jonelle', 'Coke')],
     'dessert' : [('Val', 'Sour Cake'), ('Nyanyuie', 'Croissant')],
     'nothing' : [('Obiba', ''), ('Opana', '')]
 }
 
 event_obj = {
-    'Picnic': {},
-    'Nyanyuie Birthday': {},
-    'May Day' : {},
-    'Sleepover' :  {},
+    'Sample': {},
 }
 
 for event in event_obj:
@@ -118,6 +115,8 @@ def event_select(event):
             dessert_lab.grid_remove()
             drinks_lab.grid_remove()
 
+            event_name_lab.config(text=event_e.upper() + ' EVENT')
+
             starter_lab.grid(row=0, column=0, pady=10)
             main_meal_btn.grid(row=0, column=0, pady=10)
             dessert_btn.grid(row=0, column=0, pady=10)
@@ -184,7 +183,29 @@ mod_return_btn.bind('<Leave>', mod_return_lve)
 new_event_name = StringVar()
 new_event_name.set('Enter Event Name: ')
 
-def add_event_act():
+mod_event_lab = Label(mod_event_frame, font=('monospace', 10, 'bold'))
+mod_event_mes = Label(mod_event_frame, font=('monospace', 8, 'italic'), fg= "#B0A4DA", bg="#5D52BE", justify='center')
+def storePartics(newPartic):
+    participants = []
+    temp_details = ""
+    nesting = 0
+    
+    for char in newPartic:
+        if char == '(':
+            if nesting == 0:
+                temp_details = ""
+            nesting += 1
+        elif char == ')':
+            nesting -= 1
+            if nesting == 0:
+                participants.append(tuple(x.strip() for x in temp_details.split(',')))
+        else:
+            if nesting > 0:
+                temp_details += char
+    
+    return participants
+
+def add_event_sub():
     event_e = new_event_name.get()
     event_obj[event_e] = copy.deepcopy(meal_cat)
 
@@ -192,6 +213,24 @@ def add_event_act():
     events_frame.insert(END, '')
 
     add_event_input.config(fg="#628281", font=('Segoe UI sans serif', 10, 'italic'))
+
+    event_obj[event_e] = {
+        'starter' : [],
+        'main_meal' : [],
+        'drinks' :[],
+        'dessert' : [],
+        'nothing' : []
+    }
+    
+    mess = ''
+    for partic in storePartics(new_event_partic_name.get()):
+        for cat in event_obj[event_e]:
+            if partic[1] == cat:
+                event_obj[event_e][cat].append((partic[0], partic[2]))
+                mess += partic[0] + ' Added, '
+    
+    add_event_partic_input.config(fg='#628281', font=('Segoe UI sans serif', 10, 'italic'), justify='left')
+    new_event_partic_name.set(mess[:-2])
     new_event_name.set(event_e + ' Added')
 
 def add_change_text(event):
@@ -202,13 +241,13 @@ add_event_input = Entry(mod_event_frame, width=25, font=('Segoe UI sans serif', 
 add_event_input.bind('<Button-1>', add_change_text)
 
 new_event_partic_name = StringVar()
-new_event_partic_name.set('Participants -> (Name, Category, Food)')
+new_event_partic_name.set('Participants -> (Name, Category, Food[one_word])')
 
 def add_event_partic_change_text(event):
     new_event_partic_name.set('')
     add_event_partic_input.config(fg='black', font=('Segoe UI sans serif', 13), justify='left')
 
-add_event_partic_input = Entry(mod_event_frame, width=35, font=('Segoe UI sans serif', 10, 'italic'), textvariable=new_event_partic_name, fg='grey', justify='center')
+add_event_partic_input = Entry(mod_event_frame, width=43, font=('Segoe UI sans serif', 10, 'italic'), textvariable=new_event_partic_name, fg='grey', justify='center')
 add_event_partic_input.bind('<Button-1>', add_event_partic_change_text)
 
 def add_sub_enter(event):
@@ -216,7 +255,7 @@ def add_sub_enter(event):
 
 def add_sub_lve(event):
     add_submit.config(bg="#6DA98F")
-add_submit = Button(mod_event_frame, font=('monospace', 13, 'bold'), text='Add', fg="white", bg="#6DA98F", activebackground='#677F74', activeforeground='white', command=lambda:add_event_act())
+add_submit = Button(mod_event_frame, font=('monospace', 13, 'bold'), text='Add', fg="white", bg="#6DA98F", activebackground='#677F74', activeforeground='white', command=lambda:add_event_sub())
 add_submit.bind('<Enter>', add_sub_enter)
 add_submit.bind('<Leave>', add_sub_lve)
 
@@ -236,9 +275,13 @@ def add_event():
 
     del_event_input.grid_remove()
     del_submit.grid_remove()
-    add_event_input.grid(row=1, column=0, pady=(10,5), padx=10)
-    add_event_partic_input.grid(row=2, column=0, pady=(5, 0), padx=10)
-    add_submit.grid(row=3, column=0, pady=10)
+    mod_event_lab.config(text = 'NEW EVENT', bg= "#008B69", fg="#E1FFFA")
+    mod_event_lab.grid(row=1, column=0, pady=(10,5), padx=10)
+    add_event_input.grid(row=2, column=0, pady=(10,5), padx=10)
+    add_event_partic_input.grid(row=3, column=0, pady=(5, 0), padx=10)
+    mod_event_mes.config(bg='#45544E', fg='#A3AF9E', text='Categories : starter, main_meal, dessert, drinks', justify='center')
+    mod_event_mes.grid(row=4, column=0)
+    add_submit.grid(row=5, column=0, pady=10)
 
 def add_enter_event(event):
     add_event_btn.config(bg='#9A89B4', fg='#FCF8FF')
@@ -305,8 +348,11 @@ def del_event():
     add_event_input.grid_remove()
     add_event_partic_input.grid_remove()
     add_submit.grid_remove()
-    del_event_input.grid(row=1, column=0, pady=(10,0), padx=10)
-    del_submit.grid(row=2, column=0, pady=10)
+    mod_event_mes.grid_remove()
+    mod_event_lab.config(text= 'DELETE EVENT', bg='#B64722', fg='#FFFFFF')
+    mod_event_lab.grid(row=1, column=0, padx=10)
+    del_event_input.grid(row=2, column=0, pady=(10,0), padx=10)
+    del_submit.grid(row=3, column=0, pady=10)
 
 del_event_btn = Button(btn_frame, text="DELETE EVENT", font=('monospace', 13, 'bold'), bg= "#291466", fg="#FFFFFF", activebackground='#111111', activeforeground='#FFFFFF', command=lambda: del_event())
 del_event_btn.grid(row=0, column=1, padx=(0,5))
@@ -317,9 +363,13 @@ del_event_btn.bind('<Leave>', del_lve_event)
 # MEAL CATEGORY PRESENTATION
 meal_cat_wrapper = Frame(root, width=100, height=100, bg='#5D52BE')
 
+# EVENT NAME
+event_name_lab = Label(meal_cat_wrapper, bg='#FCF7FF', fg='#352A80', font=('monospace', 13, 'bold'))
+event_name_lab.grid(row=0, column=0, columnspan=3, pady=10)
+
 # STARTER
 starter_wrap = Frame(meal_cat_wrapper, bg='#5D52BE')
-starter_wrap.grid(row=0, column=0, padx=10)
+starter_wrap.grid(row=1, column=0, padx=10)
 
 starter_lab = Label(starter_wrap, text="STARTER", bg='#FCF7FF', fg='#352A80', font=('monospace', 13, 'bold'))
 starter_lab.grid(row=0, column=0, pady=10)
@@ -390,7 +440,7 @@ starter_cat.bind('<<ListboxSelect>>', starter_cat_sel)
 
 # DRINKS
 drinks_wrap = Frame(meal_cat_wrapper, bg='#5D52BE')
-drinks_wrap.grid(row=0, column=1, padx=(0, 10))
+drinks_wrap.grid(row=1, column=1, padx=(0, 10))
 
 drinks_lab = Label(drinks_wrap, text='DRINKS', bg='#FCF7FF', fg='#352A80', font=('monospace', 13, 'bold'))
 drinks_lab.grid(row=0, column=0, pady=10)
@@ -429,7 +479,7 @@ def show_drinks():
                     drinks_cat.insert(END, '')
 
                 for i in range(partic_list.size()):
-                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['main meal']]:
+                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['main_meal']]:
                         partic_list.itemconfig(i, bg='#5D52BE', fg='#FBF8FF')
                     else:
                         partic_list.itemconfig(i, fg='#312E34', bg='#FBF8FF')
@@ -457,7 +507,7 @@ drinks_cat.bind('<<ListboxSelect>>', drinks_cat_sel)
 
 # MAIN MEAL
 main_meal_wrap = Frame(meal_cat_wrapper, bg='#5D52BE')
-main_meal_wrap.grid(row=1, column=0, padx=10, pady=10)
+main_meal_wrap.grid(row=2, column=0, padx=10, pady=10)
 
 main_meal_lab = Label(main_meal_wrap,text='MAIN MEAL', bg='#FCF7FF', fg='#352A80', font=('monospace', 13, 'bold'))
 main_meal_lab.grid(row=0, column=0, pady=10)
@@ -492,12 +542,12 @@ def show_main_meal():
             if event_sel == event and event_sel in event_obj:
                 main_meal_cat.insert(END, '')
                 main_meal_cat.insert(END, '')
-                for tup in event_obj[event]['main meal']:
+                for tup in event_obj[event]['main_meal']:
                     main_meal_cat.insert(END, tup[1])
                     main_meal_cat.insert(END, '')
 
                 for i in range(partic_list.size()):
-                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['main meal']]:
+                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['main_meal']]:
                         partic_list.itemconfig(i, bg='#5D52BE', fg='#FBF8FF')
                     else:
                         partic_list.itemconfig(i, fg='#312E34', bg='#FBF8FF')
@@ -526,7 +576,7 @@ main_meal_cat.bind('<<ListboxSelect>>', main_meal_cat_sel)
 
 # DESSERT
 dessert_wrap = Frame(meal_cat_wrapper, bg='#5D52BE')
-dessert_wrap.grid(row=1, column=1, padx=(0, 10))
+dessert_wrap.grid(row=2, column=1, padx=(0, 10))
 
 dessert_lab = Label(dessert_wrap, text='DESSERT', bg='#FCF7FF', fg='#352A80', font=('monospace', 13, 'bold'))
 dessert_lab.grid(row=0, column=0, pady=10)
@@ -593,7 +643,7 @@ dessert_cat.bind('<<ListboxSelect>>', dessert_cat_sel)
 
 # PARTICIPANTS LIST
 partic_wrap = Frame(meal_cat_wrapper, bg='#FCF7FF')
-partic_wrap.grid(row=0, column=2, rowspan=2, padx=10)
+partic_wrap.grid(row=0, column=2, rowspan=3, padx=10)
 
 
 partic_lab = Label(partic_wrap, text='PARTICIPANTS', fg='#FCF7FF', bg='#352A80', font=('monospace', 13, 'bold'))
@@ -640,15 +690,49 @@ mod_partic_return_btn.bind('<Leave>', mod_partic_return_lve)
 new_partic_name = StringVar()
 new_partic_name.set('Enter Name of Participant: ')
 
-# def add_partic_act():
-    # partic_e = new_partic_name.get()
-    # event_obj[event_e] = copy.deepcopy(meal_cat)
+def extract_food_cat(input):
+    category = None
+    food = None
+    
+    if input[0] == '(' and input[-1] == ')':
+        content = input[1:-1]
+        parts = content.split(',')
+        
+        if len(parts) == 2:
+            category = parts[0].strip()
+            food = parts[1].strip()
+        else:
+            category = food = None
 
-    # events_frame.insert(END, event_e)
-    # events_frame.insert(END, '')
+    return category, food
 
-    # add_event_input.config(fg="#628281", font=('Segoe UI sans serif', 10, 'italic'))
-    # new_event_name.set(event_e + ' Added')
+
+def add_partic_sub():
+    partic_e = new_partic_name.get()
+    cat_e, food_e = extract_food_cat(new_cat_name.get())
+    event_sel_tup = events_frame.curselection()
+    if event_sel_tup:
+        event_sel_pos = event_sel_tup[0]
+        event_e = events_frame.get(event_sel_pos)
+
+        if cat_e in event_obj[event_e]:
+            event_obj[event_e][cat_e].append((partic_e, food_e))
+            new_partic_name.set(partic_e + ' Added')
+            add_partic_input.config(fg="#628281", font=('Segoe UI sans serif', 10, 'italic'))
+            new_cat_name.set('')
+
+            partic_list.insert(END, partic_e)
+            partic_list.insert(END, '')
+        else:
+            add_cat_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
+            new_partic_name.set('')
+            new_cat_name.set(cat_e + ' Unkown')
+
+    events_frame.insert(END, event_e)
+    events_frame.insert(END, '')
+
+    add_event_input.config(fg="#628281", font=('Segoe UI sans serif', 10, 'italic'))
+    new_event_name.set(event_e + ' Added')
 
 def add_partic_change_text(event):
     new_partic_name.set('')
@@ -674,11 +758,13 @@ def add_partic_sub_enter(event):
 def add_partic_sub_lve(event):
     add_partic_submit.config(bg="#6DA98F")
 
-add_partic_submit = Button(mod_partic_frame, font=('monospace', 13, 'bold'), text='Add', fg="white", bg="#6DA98F", activebackground='#677F74', activeforeground='white', command=lambda:add_event_act())
+add_partic_submit = Button(mod_partic_frame, font=('monospace', 13, 'bold'), text='Add', fg="white", bg="#6DA98F", activebackground='#677F74', activeforeground='white', command=lambda:add_partic_sub())
 add_partic_submit.bind('<Enter>', add_partic_sub_enter)
 add_partic_submit.bind('<Leave>', add_partic_sub_lve)
 
+mod_partic_lab = Label(mod_partic_frame, font=('monospace', 10, 'bold'))
 
+mod_partic_mes = Label(mod_partic_frame, font=('monospace', 8, 'italic'), bg='#45544E', fg='#A3AF9E', text='Categories : starter, main_meal, dessert, drinks', justify='center')
 def add_partic():
     return_btn.grid_remove()
     meal_cat_wrapper.grid_remove()
@@ -697,9 +783,12 @@ def add_partic():
 
     del_partic_input.grid_remove()
     del_partic_submit.grid_remove()
-    add_partic_input.grid(row=1, column=0, pady=(10,5), padx=10)
-    add_cat_input.grid(row=2, column=0, pady=(5, 0), padx=10)
-    add_partic_submit.grid(row=3, column=0, pady=10)
+    mod_partic_lab.config(text = 'NEW PARTICIPANT', bg= "#008B69", fg="#E1FFFA")
+    mod_partic_lab.grid(row=1, column=0, pady=(10,5), padx=10)
+    add_partic_input.grid(row=2, column=0, pady=(10,5), padx=10)
+    add_cat_input.grid(row=3, column=0, pady=(5, 0), padx=10)
+    mod_partic_mes.grid(row=4, column=0, padx=10)
+    add_partic_submit.grid(row=5, column=0, pady=10)
 
 def add_partic_enter(event):
     add_partic_btn.config(bg='#9A89B4', fg='#FCF8FF')
@@ -716,16 +805,52 @@ add_partic_btn.bind('<Leave>', add_partic_lve)
 old_partic_name = StringVar()
 old_partic_name.set('Enter Name of Participant: ')
 
-# def del_partic():
-    # partic_e = old_partic_name.get()
+def del_partic_sub():
+    partic_e = old_partic_name.get()
+    event_pos_tup = events_frame.curselection()
+    if event_pos_tup:
+        event_pos = event_pos_tup[0]
+        event_e = events_frame.get(event_pos)
+        
+        found = False
+        for cat in event_obj[event_e]:
+            # print(cat)
+            for tup in event_obj[event_e][cat]:
+                print(tup[0] == partic_e)
+                if tup[0] == partic_e:
+                    event_obj[event_e][cat].remove(tup)
+                    old_partic_name.set(tup[0] + ' Deleted')
+                    del_partic_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
 
-    # for i in range(events_frame.size()):
-    #     if old_event_name.get() == events_frame.get(i):
-    #         events_frame.delete(i)
-    #         del event_obj[event_e]
+                    for i in range(partic_list.size()):
+                        if partic_list.get(i) == partic_e:
+                            partic_list.delete(i)
+                            if partic_list.get(i + 1) == '':
+                                partic_list.delete(i)
 
-    #         del_event_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
-    #         old_event_name.set(event_e + ' Deleted')
+
+                    for i in reversed(range(starter_cat.size())):
+                        if starter_cat.get(i) == tup[1]:
+                            starter_cat.delete(i)
+                    
+                    for i in reversed(range(drinks_cat.size())):
+                        if drinks_cat.get(i) == tup[1]:
+                            drinks_cat.delete(i)
+
+                    for i in reversed(range(dessert_cat.size())):
+                        if dessert_cat.get(i) == tup[1]:
+                            dessert_cat.delete(i)
+
+                    for i in reversed(range(main_meal_cat.size())):
+                        if main_meal_cat.get(i) == tup[1]:
+                            main_meal_cat.delete(i)
+                    found = True
+                    break
+            if found:
+                break
+            else:
+                old_partic_name.set(partic_e + ' not Found')
+                del_partic_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
 
 def del_change_text(event):
     old_partic_name.set('')
@@ -740,7 +865,7 @@ def del_partic_sub_enter(event):
 def del_partic_sub_lve(event):
     del_partic_submit.config(bg="#A96E6D")
 
-del_partic_submit = Button(mod_partic_frame, font=('monospace', 13, 'bold'), text='Delete', fg="white", bg="#A96E6D", activebackground='#7F6767', activeforeground='white', command=lambda:del_partic())
+del_partic_submit = Button(mod_partic_frame, font=('monospace', 13, 'bold'), text='Delete', fg="white", bg="#A96E6D", activebackground='#7F6767', activeforeground='white', command=lambda:del_partic_sub())
 del_partic_submit.bind('<Enter>', del_partic_sub_enter)
 del_partic_submit.bind('<Leave>', del_partic_sub_lve)
 
@@ -769,8 +894,11 @@ def del_partic():
     add_partic_input.grid_remove()
     add_partic_submit.grid_remove()
     add_cat_input.grid_remove()
-    del_partic_input.grid(row=1, column=0, pady=(10,0), padx=10)
-    del_partic_submit.grid(row=2, column=0, pady=10)
+    mod_partic_mes.grid_remove()
+    mod_partic_lab.config(text= 'DELETE PARTICIPANT', bg='#B64722', fg='#FFFFFF')
+    mod_partic_lab.grid(row=1, column=0, padx=10)
+    del_partic_input.grid(row=2, column=0, pady=(10,0), padx=10)
+    del_partic_submit.grid(row=3, column=0, pady=10)
 
 del_partic_btn = Button(mod_partic_btn_wrap, text="REMOVE PARTICIPANT", font=('monospace', 13, 'bold'), bg= "#291466", fg="#FFFFFF", activebackground='#111111', activeforeground='#FFFFFF', command=lambda: del_partic())
 del_partic_btn.grid(row=0, column=1, padx=(0,5))
