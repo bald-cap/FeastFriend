@@ -28,9 +28,3 @@ The application's structure is based on the Tkinter GUI toolkit for Python:
 - Role: Developer of FeastFriend
 - Responsibilities: Designing, coding, and testing the application.
 - Contact: [mnyanyuie@gmail.com]
-
-## License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
-
-## Acknowledgments
-- Thanks to everyone who has contributed to testing and providing feedback for the application.
