@@ -1,4 +1,5 @@
 from tkinter import *
+import json
 import copy
 
 root = Tk()
@@ -6,21 +7,7 @@ root.title('FeastFriend')
 root.geometry('500x500')
 root.config(bg='#FCFBFD')
 
-#OBJECTS/ EVENT CONTROL
-meal_cat = {
-    'starter' : [('Michael', 'Pickles'), ('Kofi', 'Chips')],
-    'main_meal' : [('Divin', 'Banku'), ('Emma', 'Tuo Zaafi')],
-    'drinks' :[('Andi', 'Wine'), ('Jonelle', 'Coke')],
-    'dessert' : [('Val', 'Sour Cake'), ('Nyanyuie', 'Croissant')],
-    'nothing' : [('Obiba', ''), ('Opana', '')]
-}
-
-event_obj = {
-    'Sample': {},
-}
-
-for event in event_obj:
-    event_obj[event] = copy.deepcopy(meal_cat) 
+#OBJECTS/ EVENT CONTROL - db.json
 
 welcome_mes = Label(root, text="FeastFriends", font=('monospace', 10, 'bold'), fg= "#5D54B1", bg="#FCFBFD")
 welcome_mes.grid(row=0, column=0)
@@ -121,23 +108,26 @@ def event_select(event):
             main_meal_btn.grid(row=0, column=0, pady=10)
             dessert_btn.grid(row=0, column=0, pady=10)
             drinks_btn.grid(row=0, column=0, pady=10)
+
+            with open('db.json', 'r') as f:
+                temp_event_obj = json.load(f)
             
-            for event_key in event_obj:
+            for event_key in temp_event_obj:
                 if event_key == event_e:
-                    for cat in event_obj[event_e]:
-                        for tup in event_obj[event_e][cat]:
+                    for cat in temp_event_obj[event_e]:
+                        for tup in temp_event_obj[event_e][cat]:
                             partic_list.insert(END, tup[0])
                             partic_list.insert(END, '')
 
-                if event_e == event_key and event_e in event_obj:
+                if event_e == event_key and event_e in temp_event_obj:
                     starter_cat.insert(END, '')
                     starter_cat.insert(END, '')
-                    for tup in event_obj[event_e]['starter']:
+                    for tup in temp_event_obj[event_e]['starter']:
                         starter_cat.insert(END, tup[1])
                         starter_cat.insert(END, '')
 
                         for i in range(partic_list.size()):
-                            if partic_list.get(i) in [t[0] for t in event_obj[event_e]['starter']]:
+                            if partic_list.get(i) in [t[0] for t in temp_event_obj[event_e]['starter']]:
                                 partic_list.itemconfig(i, bg='#5D52BE', fg='#FBF8FF')
                             else:
                                 partic_list.itemconfig(i, fg='#312E34', bg='#FBF8FF')
@@ -153,6 +143,9 @@ events_frame.bind('<<ListboxSelect>>', event_select)
 events_frame.bind('<Leave>', events_frame_leave)
 
 # events_frame.insert(END, '')
+with open('db.json', 'r') as f:
+    event_obj = json.load(f)
+
 events_frame.insert(END, '')
 for event in event_obj:
     events_frame.insert(END, event)
@@ -206,15 +199,17 @@ def storePartics(newPartic):
     return participants
 
 def add_event_sub():
+    with open('db.json', 'r') as f:
+        temp_event_obj = json.load(f)
+
     event_e = new_event_name.get()
-    event_obj[event_e] = copy.deepcopy(meal_cat)
 
     events_frame.insert(END, event_e)
     events_frame.insert(END, '')
 
     add_event_input.config(fg="#628281", font=('Segoe UI sans serif', 10, 'italic'))
 
-    event_obj[event_e] = {
+    temp_event_obj[event_e] = {
         'starter' : [],
         'main_meal' : [],
         'drinks' :[],
@@ -224,10 +219,13 @@ def add_event_sub():
     
     mess = ''
     for partic in storePartics(new_event_partic_name.get()):
-        for cat in event_obj[event_e]:
+        for cat in temp_event_obj[event_e]:
             if partic[1] == cat:
-                event_obj[event_e][cat].append((partic[0], partic[2]))
+                temp_event_obj[event_e][cat].append((partic[0], partic[2]))
                 mess += partic[0] + ' Added, '
+
+                with open('db.json', 'w') as f:
+                    json.dump(temp_event_obj, f, indent=4)
     
     add_event_partic_input.config(fg='#628281', font=('Segoe UI sans serif', 10, 'italic'), justify='left')
     new_event_partic_name.set(mess[:-2])
@@ -304,10 +302,16 @@ def del_event_act():
     for i in range(events_frame.size()):
         if old_event_name.get() == events_frame.get(i):
             events_frame.delete(i)
-            del event_obj[event_e]
+
+            with open('db.json', 'r') as f:
+                temp_event_obj = json.load(f)
+            del temp_event_obj[event_e]
 
             del_event_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
             old_event_name.set(event_e + ' Deleted')
+
+            with open('db.json', 'w') as f:
+                json.dump(temp_event_obj, f, indent=4)
 
 def del_change_text(event):
     old_event_name.set('')
@@ -399,22 +403,23 @@ def show_starter():
         pos_event_sel = pos_event_sel_tup[0]
         event_sel = events_frame.get(pos_event_sel)
         
-        for event in event_obj:
-            if event_sel == event and event_sel in event_obj:
+        with open('db.json', 'r') as f:
+            temp_event_obj = json.load(f)
+
+        for event in temp_event_obj:
+            if event_sel == event and event_sel in temp_event_obj:
                 starter_cat.insert(END, '')
                 starter_cat.insert(END, '')
-                for tup in event_obj[event]['starter']:
+                for tup in temp_event_obj[event]['starter']:
                     starter_cat.insert(END, tup[1])
                     starter_cat.insert(END, '')
 
                 for i in range(partic_list.size()):
-                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['starter']]:
+                    if partic_list.get(i) in [t[0] for t in temp_event_obj[event_sel]['starter']]:
                         partic_list.itemconfig(i, bg='#5D52BE', fg='#FBF8FF')
                     else:
                         partic_list.itemconfig(i, fg='#312E34', bg='#FBF8FF')
-
         
-
 
 def starter_enter(event):
     starter_btn.config(bg='#5495AA', fg='#F7FDFF')
@@ -469,17 +474,20 @@ def show_drinks():
     if pos_event_sel_tup:
         pos_event_sel = pos_event_sel_tup[0]
         event_sel = events_frame.get(pos_event_sel)
+
+        with open('db.json', 'r') as f:
+            temp_event_obj = json.load(f)
         
-        for event in event_obj:
-            if event_sel == event and event_sel in event_obj:
+        for event in temp_event_obj:
+            if event_sel == event and event_sel in temp_event_obj:
                 drinks_cat.insert(END, '')
                 drinks_cat.insert(END, '')
-                for tup in event_obj[event]['drinks']:
+                for tup in temp_event_obj[event]['drinks']:
                     drinks_cat.insert(END, tup[1])
                     drinks_cat.insert(END, '')
 
                 for i in range(partic_list.size()):
-                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['main_meal']]:
+                    if partic_list.get(i) in [t[0] for t in temp_event_obj[event_sel]['drinks']]:
                         partic_list.itemconfig(i, bg='#5D52BE', fg='#FBF8FF')
                     else:
                         partic_list.itemconfig(i, fg='#312E34', bg='#FBF8FF')
@@ -537,20 +545,24 @@ def show_main_meal():
     if pos_event_sel_tup:
         pos_event_sel = pos_event_sel_tup[0]
         event_sel = events_frame.get(pos_event_sel)
+
+        with open('db.json', 'r') as f:
+            temp_event_obj = json.load(f)
         
-        for event in event_obj:
-            if event_sel == event and event_sel in event_obj:
+        for event in temp_event_obj:
+            if event_sel == event and event_sel in temp_event_obj:
                 main_meal_cat.insert(END, '')
                 main_meal_cat.insert(END, '')
-                for tup in event_obj[event]['main_meal']:
+                for tup in temp_event_obj[event]['main_meal']:
                     main_meal_cat.insert(END, tup[1])
                     main_meal_cat.insert(END, '')
 
                 for i in range(partic_list.size()):
-                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['main_meal']]:
+                    if partic_list.get(i) in [t[0] for t in temp_event_obj[event_sel]['main_meal']]:
                         partic_list.itemconfig(i, bg='#5D52BE', fg='#FBF8FF')
                     else:
                         partic_list.itemconfig(i, fg='#312E34', bg='#FBF8FF')
+
 
 def main_meal_enter(event):
     main_meal_btn.config(bg='#5495AA', fg='#F7FDFF')
@@ -605,20 +617,24 @@ def show_dessert():
     if pos_event_sel_tup:
         pos_event_sel = pos_event_sel_tup[0]
         event_sel = events_frame.get(pos_event_sel)
+
+        with open('db.json', 'r') as f:
+            temp_event_obj = json.load(f)
         
-        for event in event_obj:
-            if event_sel == event and event_sel in event_obj:
+        for event in temp_event_obj:
+            if event_sel == event and event_sel in temp_event_obj:
                 dessert_cat.insert(END, '')
                 dessert_cat.insert(END, '')
-                for tup in event_obj[event]['dessert']:
+                for tup in temp_event_obj[event]['dessert']:
                     dessert_cat.insert(END, tup[1])
                     dessert_cat.insert(END, '')
 
                 for i in range(partic_list.size()):
-                    if partic_list.get(i) in [t[0] for t in event_obj[event_sel]['dessert']]:
+                    if partic_list.get(i) in [t[0] for t in temp_event_obj[event_sel]['dessert']]:
                         partic_list.itemconfig(i, bg='#5D52BE', fg='#FBF8FF')
                     else: 
                         partic_list.itemconfig(i, fg='#312E34', bg='#FBF8FF')
+                    
 
 def dessert_enter(event):
     dessert_btn.config(bg='#5495AA', fg='#F7FDFF')
@@ -715,14 +731,20 @@ def add_partic_sub():
         event_sel_pos = event_sel_tup[0]
         event_e = events_frame.get(event_sel_pos)
 
-        if cat_e in event_obj[event_e]:
-            event_obj[event_e][cat_e].append((partic_e, food_e))
+        with open('db.json', 'r') as f:
+            temp_event_obj = json.load(f)
+
+        if cat_e in temp_event_obj[event_e]:
+            temp_event_obj[event_e][cat_e].append((partic_e, food_e))
             new_partic_name.set(partic_e + ' Added')
             add_partic_input.config(fg="#628281", font=('Segoe UI sans serif', 10, 'italic'))
             new_cat_name.set('')
 
             partic_list.insert(END, partic_e)
             partic_list.insert(END, '')
+
+            with open('db.json', 'w') as f:
+                json.dump(temp_event_obj, f, indent=4)
         else:
             add_cat_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
             new_partic_name.set('')
@@ -811,20 +833,26 @@ def del_partic_sub():
     if event_pos_tup:
         event_pos = event_pos_tup[0]
         event_e = events_frame.get(event_pos)
+
+        with open('db.json', 'r') as f:
+            temp_event_obj = json.load(f)
         
         found = False
-        for cat in event_obj[event_e]:
+        for cat in temp_event_obj[event_e]:
             # print(cat)
-            for tup in event_obj[event_e][cat]:
+            for tup in temp_event_obj[event_e][cat]:
                 print(tup[0] == partic_e)
                 if tup[0] == partic_e:
-                    event_obj[event_e][cat].remove(tup)
+                    temp_event_obj[event_e][cat].remove(tup)
                     old_partic_name.set(tup[0] + ' Deleted')
                     del_partic_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
 
                     for i in range(partic_list.size()):
                         if partic_list.get(i) == partic_e:
                             partic_list.delete(i)
+
+                            with open('db.json', 'w') as f:
+                                json.load(temp_event_obj, f, indent=4)
                             if partic_list.get(i + 1) == '':
                                 partic_list.delete(i)
 

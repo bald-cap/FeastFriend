@@ -1,0 +1,88 @@
+{
+    "Sample": {
+        "starter": [
+            [
+                "Michael",
+                "Pickles"
+            ],
+            [
+                "Kofi",
+                "Chips"
+            ]
+        ],
+        "main_meal": [
+            [
+                "Divin",
+                "Banku"
+            ],
+            [
+                "Emma",
+                "Tuo Zaafi"
+            ]
+        ],
+        "drinks": [
+            [
+                "Andi",
+                "Wine"
+            ],
+            [
+                "Jonelle",
+                "Coke"
+            ]
+        ],
+        "dessert": [
+            [
+                "Val",
+                "Sour Cake"
+            ],
+            [
+                "Nyanyuie",
+                "Croissant"
+            ]
+        ],
+        "nothing": [
+            [
+                "Obiba",
+                ""
+            ],
+            [
+                "Opana",
+                ""
+            ]
+        ]
+    },
+    "My Birthday": {
+        "starter": [
+            [
+                "Sammy",
+                "Fanta"
+            ]
+        ],
+        "main_meal": [
+            [
+                "Afi",
+                "Fufu"
+            ]
+        ],
+        "drinks": [],
+        "dessert": [],
+        "nothing": []
+    },
+    "Labour Day": {
+        "starter": [
+            [
+                "Valerie",
+                "Velvet"
+            ]
+        ],
+        "main_meal": [
+            [
+                "Michael",
+                "Croissant"
+            ]
+        ],
+        "drinks": [],
+        "dessert": [],
+        "nothing": []
+    }
+}
