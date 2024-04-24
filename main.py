@@ -264,6 +264,7 @@ def add_event():
 
     add_event_input.config(fg='grey', font=('Segoe UI sans serif', 10))
     new_event_name.set('Enter Event Name: ')
+    new_event_partic_name.set('Participants -> (Name, Category, Food[one_word])')
 
     root.geometry("500x300")
 
@@ -847,12 +848,12 @@ def del_partic_sub():
                     old_partic_name.set(tup[0] + ' Deleted')
                     del_partic_input.config(fg="#826762", font=('Segoe UI sans serif', 10, 'italic'))
 
+                    with open('db.json', 'w') as f:
+                        json.dump(temp_event_obj, f, indent=4)
                     for i in range(partic_list.size()):
                         if partic_list.get(i) == partic_e:
                             partic_list.delete(i)
 
-                            with open('db.json', 'w') as f:
-                                json.load(temp_event_obj, f, indent=4)
                             if partic_list.get(i + 1) == '':
                                 partic_list.delete(i)
 

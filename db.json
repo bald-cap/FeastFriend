@@ -75,12 +75,7 @@
                 "Velvet"
             ]
         ],
-        "main_meal": [
-            [
-                "Michael",
-                "Croissant"
-            ]
-        ],
+        "main_meal": [],
         "drinks": [],
         "dessert": [],
         "nothing": []
