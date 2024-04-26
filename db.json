@@ -64,7 +64,12 @@
                 "Fufu"
             ]
         ],
-        "drinks": [],
+        "drinks": [
+            [
+                "Michael",
+                "Fanta"
+            ]
+        ],
         "dessert": [],
         "nothing": []
     },
