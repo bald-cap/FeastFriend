@@ -977,8 +977,6 @@ del_partic_btn.grid(row=0, column=1, padx=(0,5))
 del_partic_btn.bind('<Enter>', del_partic_enter)
 del_partic_btn.bind('<Leave>', del_partic_lve)
 
-
-
 cols, rows = root.grid_size()
 for i in range(cols):
     root.grid_columnconfigure(i, weight=1)
